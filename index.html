@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz: Mente de Estrategista ou Manipulador?</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #111111 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+            color: #e0e0e0;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(120, 0, 0, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(0, 0, 0, 0.3) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .quiz-container {
+            background: rgba(10, 10, 10, 0.9);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 0, 0, 0.2);
+            border-radius: 12px;
+            box-shadow: 
+                0 10px 30px -10px rgba(0, 0, 0, 0.8),
+                0 0 0 1px rgba(255, 255, 255, 0.03);
+            max-width: 650px;
+            width: 100%;
+            padding: 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .quiz-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #8b0000, #500000, #300000);
+            border-radius: 12px 12px 0 0;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 2px;
+            margin-bottom: 25px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #8b0000, #500000);
+            border-radius: 2px;
+            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            width: 0%;
+        }
+
+        .step-counter {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.4);
+            margin-bottom: 20px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .question-title {
+            font-size: 28px;
+            font-weight: 800;
+            color: #e0e0e0;
+            margin-bottom: 15px;
+            line-height: 1.3;
+        }
+
+        .question-subtitle {
+            font-size: 16px;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 30px;
+            line-height: 1.5;
+            font-weight: 400;
+        }
+
+        .cta-button {
+            background: linear-gradient(135deg, #8b0000 0%, #500000 100%);
+            color: white;
+            border: none;
+            padding: 16px 35px;
+            font-size: 16px;
+            font-weight: 700;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(139, 0, 0, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(139, 0, 0, 0.4);
+        }
+
+        .question-content {
+            display: none;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        .question-content.active {
+            display: block;
+        }
+
+        .options {
+            list-style: none;
+            margin: 30px 0;
+        }
+
+        .option {
+            background: rgba(20, 20, 20, 0.8);
+            border: 1px solid rgba(255, 0, 0, 0.2);
+            border-radius: 8px;
+            padding: 18px 20px;
+            margin: 12px 0;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: left;
+            font-size: 15px;
+            color: rgba(255, 255, 255, 0.8);
+            position: relative;
+        }
+
+        .option:hover {
+            border-color: rgba(139, 0, 0, 0.5);
+            background: rgba(30, 30, 30, 0.8);
+            transform: translateY(-1px);
+        }
+
+        .option.selected {
+            border-color: #8b0000;
+            background: rgba(139, 0, 0, 0.2);
+            color: white;
+            box-shadow: 0 0 15px rgba(139, 0, 0, 0.3);
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 15px 18px;
+            border: 1px solid rgba(255, 0, 0, 0.3);
+            border-radius: 6px;
+            font-size: 15px;
+            margin: 20px 0;
+            transition: all 0.3s ease;
+            background: rgba(20, 20, 20, 0.8);
+            color: white;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .input-field::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: #8b0000;
+            box-shadow: 0 0 0 2px rgba(139, 0, 0, 0.2);
+        }
+
+        .next-button {
+            background: linear-gradient(135deg, #500000 0%, #300000 100%);
+            color: white;
+            border: none;
+            padding: 14px 30px;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+            opacity: 0.4;
+            pointer-events: none;
+            font-family: 'Inter', sans-serif;
+            text-transform: uppercase;
+        }
+
+        .next-button.enabled {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .next-button:hover.enabled {
+            transform: translateY(-1px);
+            box-shadow: 0 5px 15px rgba(139, 0, 0, 0.3);
+        }
+
+        .emotional-phrase {
+            background: rgba(139, 0, 0, 0.15);
+            color: rgba(255, 255, 255, 0.7);
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-style: italic;
+            font-size: 14px;
+            display: none;
+            border: 1px solid rgba(255, 0, 0, 0.1);
+            border-left: 3px solid #8b0000;
+        }
+
+        .emotional-phrase.show {
+            display: block;
+        }
+
+        .loading-screen {
+            display: none;
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .loading-screen.active {
+            display: block;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(255, 0, 0, 0.1);
+            border-top: 3px solid #8b0000;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 25px;
+        }
+
+        .loading-text {
+            font-size: 15px;
+            color: rgba(255, 255, 255, 0.6);
+            margin: 12px 0;
+            font-weight: 500;
+        }
+
+        .leader-images {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .leader {
+            text-align: center;
+            margin: 8px;
+            cursor: pointer;
+            padding: 12px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            background: rgba(20, 20, 20, 0.8);
+            border: 1px solid rgba(255, 0, 0, 0.2);
+            flex: 1;
+            min-width: 110px;
+        }
+
+        .leader:hover {
+            background: rgba(30, 30, 30, 0.8);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(139, 0, 0, 0.2);
+            border-color: rgba(139, 0, 0, 0.3);
+        }
+
+        .leader.selected {
+            background: rgba(139, 0, 0, 0.2);
+            border-color: #8b0000;
+            box-shadow: 0 0 15px rgba(139, 0, 0, 0.3);
+        }
+
+        .leader-photo {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #500000, #300000);
+            margin: 0 auto 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            font-weight: 700;
+            color: white;
+        }
+
+        .leader-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 4px;
+        }
+
+        .leader-company {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .result-card {
+            background: rgba(20, 20, 20, 0.9);
+            border: 1px solid rgba(255, 0, 0, 0.2);
+            border-radius: 10px;
+            padding: 30px;
+            margin: 20px 0;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .result-title {
+            font-size: 24px;
+            font-weight: 800;
+            margin-bottom: 15px;
+            color: #8b0000;
+            text-transform: uppercase;
+        }
+
+        .result-description {
+            font-size: 15px;
+            line-height: 1.6;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 20px;
+        }
+
+        .result-next-step {
+            background: rgba(139, 0, 0, 0.1);
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 0, 0, 0.1);
+        }
+
+        .result-next-step h4 {
+            color: #8b0000;
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
+
+        .offer-content {
+            text-align: left;
+            padding: 25px;
+            background: rgba(20, 20, 20, 0.9);
+            border-radius: 10px;
+            border: 1px solid rgba(255, 0, 0, 0.2);
+            margin-top: 15px;
+        }
+
+        .offer-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #8b0000;
+            margin-bottom: 15px;
+            text-align: center;
+            text-transform: uppercase;
+        }
+
+        .offer-list {
+            list-style: none;
+            margin: 15px 0;
+        }
+
+        .offer-list li {
+            color: rgba(255, 255, 255, 0.8);
+            margin: 10px 0;
+            padding-left: 22px;
+            position: relative;
+            font-size: 14px;
+        }
+
+        .offer-list li::before {
+            content: '■';
+            position: absolute;
+            left: 0;
+            color: #8b0000;
+            font-size: 10px;
+            top: 4px;
+        }
+
+        .price-highlight {
+            background: linear-gradient(135deg, #8b0000, #500000);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            text-align: center;
+        }
+
+        .final-cta {
+            background: linear-gradient(135deg, #8b0000 0%, #500000 100%);
+            color: white;
+            border: none;
+            padding: 16px 35px;
+            font-size: 16px;
+            font-weight: 700;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 15px auto;
+            display: block;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(139, 0, 0, 0.3);
+            text-transform: uppercase;
+        }
+
+        .final-cta:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(139, 0, 0, 0.4);
+        }
+
+        .error-message {
+            color: #ff6b6b;
+            font-size: 13px;
+            margin-top: 10px;
+            display: none;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .quiz-container {
+                padding: 30px 20px;
+            }
+            
+            .question-title {
+                font-size: 22px;
+            }
+            
+            .question-subtitle {
+                font-size: 14px;
+            }
+            
+            .leader {
+                min-width: 90px;
+                padding: 10px;
+            }
+
+            .leader-photo {
+                width: 60px;
+                height: 60px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="quiz-container">
+        <!-- Intro Screen -->
+        <div id="intro" class="question-content active">
+            <h1 class="question-title">🔍 VOCÊ TEM A MENTE DE UM ESTRATEGISTA OU MANIPULADOR?</h1>
+            <p class="question-subtitle">Descubra em 3 minutos qual tipo de poder você possui - e como usá-lo para dominar qualquer situação.</p>
+            <button class="cta-button" onclick="startQuiz()">INICIAR TESTE</button>
+        </div>
+
+        <!-- Progress Bar (hidden on intro) -->
+        <div class="progress-bar" id="progressBar" style="display: none;">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+        <div class="step-counter" id="stepCounter" style="display: none;"></div>
+
+        <!-- Question 1: Age -->
+        <div id="q1" class="question-content">
+            <h2 class="question-title">Qual sua idade?</h2>
+            <input type="number" class="input-field" placeholder="Digite sua idade" min="16" max="100" id="ageInput" oninput="checkAgeInput()">
+            <div class="error-message" id="ageError">Por favor, digite uma idade entre 16 e 100 anos.</div>
+            <button class="next-button" id="next1" onclick="nextQuestion(1)">PRÓXIMA →</button>
+        </div>
+
+        <!-- Question 2: Financial Reality -->
+        <div id="q2" class="question-content">
+            <h2 class="question-title">Como está sua realidade financeira atual?</h2>
+            <ul class="options">
+                <li class="option" onclick="selectOption(2, 'A', this, 'Vivo no limite todo mês')">Vivo no limite todo mês</li>
+                <li class="option" onclick="selectOption(2, 'B', this, 'Pago as contas, mas não sobra')">Pago as contas, mas não sobra</li>
+                <li class="option" onclick="selectOption(2, 'C', this, 'Tenho alguma folga, mas quero mais')">Tenho alguma folga, mas quero mais</li>
+                <li class="option" onclick="selectOption(2, 'D', this, 'Já ganho bem, mas quero vencer o jogo')">Já ganho bem, mas quero vencer o jogo</li>
+            </ul>
+            <div class="emotional-phrase" id="phrase2">
+                "O poder começa com o reconhecimento da sua situação atual."
+            </div>
+            <button class="next-button" id="next2" onclick="nextQuestion(2)">PRÓXIMA →</button>
+        </div>
+
+        <!-- Question 3: 3x More Money -->
+        <div id="q3" class="question-content">
+            <h2 class="question-title">Se você acordasse amanhã ganhando 3x mais, o que mudaria primeiro?</h2>
+            <ul class="options">
+                <li class="option" onclick="selectOption(3, 'A', this, 'Sumiria e focaria só em mim')">Sumiria e focaria só em mim</li>
+                <li class="option" onclick="selectOption(3, 'B', this, 'Ia me impor e ser respeitado')">Ia me impor e ser respeitado</li>
+                <li class="option" onclick="selectOption(3, 'C', this, 'Ia calar quem sempre duvidou')">Ia calar quem sempre duvidou</li>
+                <li class="option" onclick="selectOption(3, 'D', this, 'Ia viver do meu jeito, sem freio')">Ia viver do meu jeito, sem freio</li>
+            </ul>
+            <div class="emotional-phrase" id="phrase3">
+                "Suas escolhas revelam seus verdadeiros motivos."
+            </div>
+            <button class="next-button" id="next3" onclick="nextQuestion(3)">PRÓXIMA →</button>
+        </div>
+
+        <!-- Question 4: Leaders -->
+        <div id="q4" class="question-content">
+            <h2 class="question-title">Se tivesse 5 minutos com alguém que venceu o jogo... com quem seria?</h2>
+            <div class="leader-images">
+                <div class="leader" onclick="selectLeader(4, 'A', this, 'Bill Gates')">
+                    <div class="leader-photo">BG</div>
+                    <div class="leader-name">Bill Gates</div>
+                    <div class="leader-company">Microsoft</div>
+                </div>
+                <div class="leader" onclick="selectLeader(4, 'B', this, 'Steve Jobs')">
+                    <div class="leader-photo">SJ</div>
+                    <div class="leader-name">Steve Jobs</div>
+                    <div class="leader-company">Apple</div>
+                </div>
+                <div class="leader" onclick="selectLeader(4, 'C', this, 'Jeff Bezos')">
+                    <div class="leader-photo">JB</div>
+                    <div class="leader-name">Jeff Bezos</div>
+                    <div class="leader-company">Amazon</div>
+                </div>
+                <div class="leader" onclick="selectLeader(4, 'D', this, 'Elon Musk')">
+                    <div class="leader-photo">EM</div>
+                    <div class="leader-name">Elon Musk</div>
+                    <div class="leader-company">Tesla/SpaceX</div>
+                </div>
+            </div>
+            <div class="emotional-phrase" id="phrase4">
+                "Os líderes que admiras refletem o poder que almejas."
+            </div>
+            <button class="next-button" id="next4" onclick="nextQuestion(4)">PRÓXIMA →</button>
+        </div>
+
+        <!-- Question 5: Open Question -->
+        <div id="q5" class="question-content">
+            <h2 class="question-title">O que você perguntaria a essa pessoa?</h2>
+            <textarea class="input-field" rows="4" placeholder="Digite sua pergunta..." id="questionInput" oninput="checkQuestionInput()" style="resize: vertical;"></textarea>
+            <div class="emotional-phrase" id="phrase5">
+                "Sua pergunta revela o que realmente deseja saber."
+            </div>
+            <button class="next-button" id="next5" onclick="nextQuestion(5)">PRÓXIMA →</button>
+        </div>
+
+        <!-- Question 6: Awareness -->
+        <div id="q6" class="question-content">
+            <h2 class="question-title">Você sabia que a maioria das pessoas com seu perfil nunca aprende a usar esse poder?</h2>
+            <ul class="options">
+                <li class="option" onclick="selectOption(6, 'A', this, 'Não sabia')">Não sabia</li>
+                <li class="option" onclick="selectOption(6, 'B', this, 'Eu imaginava')">Eu imaginava</li>
+                <li class="option" onclick="selectOption(6, 'C', this, 'Sim, e não quero fazer parte disso')">Sim, e não quero fazer parte disso</li>
+            </ul>
+            <div class="emotional-phrase" id="phrase6">
+                "O conhecimento é poder, mas apenas se aplicado."
+            </div>
+            <button class="next-button" id="next6" onclick="nextQuestion(6)">PRÓXIMA →</button>
+        </div>
+
+        <!-- Question 7: Control -->
+        <div id="q7" class="question-content">
+            <h2 class="question-title">Quando você sente que tem controle real sobre uma situação?</h2>
+            <ul class="options">
+                <li class="option" onclick="selectOption(7, 'A', this, 'Quando influencio sem falar muito')">Quando influencio sem falar muito</li>
+                <li class="option" onclick="selectOption(7, 'B', this, 'Quando as pessoas me seguem sem entender o porquê')">Quando as pessoas me seguem sem entender o porquê</li>
+                <li class="option" onclick="selectOption(7, 'C', this, 'Quando tudo acontece como eu planejei')">Quando tudo acontece como eu planejei</li>
+                <li class="option" onclick="selectOption(7, 'D', this, 'Quando crio desejo e ninguém entende por quê')">Quando crio desejo e ninguém entende por quê</li>
+            </ul>
+            <div class="emotional-phrase" id="phrase7">
+                "O verdadeiro controle é invisível aos olhos dos outros."
+            </div>
+            <button class="next-button" id="next7" onclick="nextQuestion(7)">PRÓXIMA →</button>
+        </div>
+
+        <!-- Question 8: Obstacles -->
+        <div id="q8" class="question-content">
+            <h2 class="question-title">O que mais te impede de dar o próximo passo?</h2>
+            <ul class="options">
+                <li class="option" onclick="selectOption(8, 'A', this, 'Falta de tempo')">Falta de tempo</li>
+                <li class="option" onclick="selectOption(8, 'B', this, 'Medo de não conseguir aplicar')">Medo de não conseguir aplicar</li>
+                <li class="option" onclick="selectOption(8, 'C', this, 'Já tentei de tudo antes')">Já tentei de tudo antes</li>
+                <li class="option" onclick="selectOption(8, 'D', this, 'Nada. Só preciso do caminho certo')">Nada. Só preciso do caminho certo</li>
+            </ul>
+            <div class="emotional-phrase" id="phrase8">
+                "Os obstáculos são apenas ilusões que você ainda não superou."
+            </div>
+            <button class="next-button" id="next8" onclick="nextQuestion(8)">PRÓXIMA →</button>
+        </div>
+
+        <!-- Question 9: Final Question -->
+        <div id="q9" class="question-content">
+            <h2 class="question-title">Se tivesse acesso a um manual secreto usado por líderes e manipuladores...</h2>
+            <p class="question-subtitle">Você usaria?</p>
+            <ul class="options">
+                <li class="option" onclick="selectOption(9, 'A', this, 'Sim, com certeza')">✅ Sim, com certeza</li>
+                <li class="option" onclick="selectOption(9, 'B', this, 'Talvez, se for direto')">👍 Talvez, se for direto</li>
+                <li class="option" onclick="selectOption(9, 'C', this, 'Não, prefiro descobrir sozinho')">❌ Não, prefiro descobrir sozinho</li>
+            </ul>
+            <div class="emotional-phrase" id="phrase9">
+                "Sua resposta determina se você continuará onde está ou avançará para onde poucos chegam."
+            </div>
+            <button class="next-button" id="next9" onclick="showResults()">VER RESULTADO →</button>
+        </div>
+
+        <!-- Loading Screen -->
+        <div id="loading" class="loading-screen">
+            <div class="spinner"></div>
+            <h3 class="question-title">ANALISANDO SEU PERFIL...</h3>
+            <div class="loading-text">Processando padrões psicológicos...</div>
+            <div class="loading-text">Identificando tipo de poder...</div>
+            <div class="loading-text">Gerando perfil estratégico...</div>
+        </div>
+
+        <!-- Results Screen -->
+        <div id="results" class="question-content">
+            <div class="result-card">
+                <h2 class="result-title" id="resultTitle">SEU RESULTADO</h2>
+                <div class="result-description" id="resultDescription">
+                    <!-- Result content will be inserted here -->
+                </div>
+                <div class="result-next-step">
+                    <h4>PRÓXIMO PASSO:</h4>
+                    <p id="nextStepText">Baseado no seu perfil, você tem potencial para desenvolver habilidades avançadas de influência e estratégia.</p>
+                </div>
+            </div>
+            
+            <div class="offer-content">
+                <h3 class="offer-title">OFERTA ESPECIAL</h3>
+                <ul class="offer-list">
+                    <li>As 48 Leis do Poder</li>
+                    <li>Técnicas de persuasão e influência usadas pelo FBI</li>
+                    <li>Audiobook Imersivo das 48 Leis do Poder</li>
+                    <li>Técnicas de seduções irrestíveis</li>
+                    <li>Combos Imperdíveis</li>
+                </ul>
+                <div class="price-highlight">
+                    <strong>De R$ 497 por apenas R$ 19,90</strong><br>
+                    <small>Oferta válida apenas hoje</small>
+                </div>
+                <button class="final-cta" onclick="handleFinalCTA()">QUERO DESENVOLVER MEU PODER</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Quiz data and state
+        let currentQuestion = 0;
+        let answers = {};
+        let userProfile = {};
+        const totalQuestions = 9;
+
+        // Result profiles
+        const profiles = {
+            strategist: {
+                title: "ESTRATEGISTA NATURAL",
+                description: "Você possui uma mente analítica e calculista. Tem a capacidade de ver o quadro geral e planejar vários passos à frente. Sua força está na paciência e na capacidade de criar planos complexos que outros não conseguem enxergar.",
+                nextStep: "Você precisa aprender a acelerar suas decisões e ser mais assertivo na execução dos seus planos."
+            },
+            manipulator: {
+                title: "MANIPULADOR INTUITIVO",
+                description: "Você tem uma habilidade natural para ler pessoas e situações. Consegue influenciar sem que percebam e tem um instinto aguçado para identificar pontos fracos e oportunidades.",
+                nextStep: "Você precisa aprender a usar esse poder de forma ética e construtiva para alcançar seus objetivos."
+            },
+            leader: {
+                title: "LÍDER CARISMÁTICO",
+                description: "Você tem o dom natural da liderança e consegue// Continuação do objeto profiles (que estava cortado)
+        leader: {
+            title: "LÍDER CARISMÁTICO", 
+            description: "Você tem o dom natural da liderança e consegue inspirar outros facilmente. Sua força está na capacidade de criar visões convincentes e mobilizar pessoas em torno de objetivos comuns.",
+            nextStep: "Você precisa aprender técnicas avançadas de persuasão para maximizar seu potencial de liderança."
+        },
+        hybrid: {
+            title: "HÍBRIDO PODEROSO",
+            description: "Você combina características de estrategista e manipulador, o que te torna extremamente versátil. Consegue tanto planejar quanto executar com maestria.",
+            nextStep: "Você precisa aprender a equilibrar essas habilidades para se tornar verdadeiramente imparável."
+        }
+    };
+
+    // Functions
+    function startQuiz() {
+        document.getElementById('intro').classList.remove('active');
+        document.getElementById('progressBar').style.display = 'block';
+        document.getElementById('stepCounter').style.display = 'block';
+        currentQuestion = 1;
+        showQuestion(1);
+        updateProgress();
+    }
+
+    function showQuestion(questionNum) {
+        // Hide all questions
+        const questions = document.querySelectorAll('.question-content');
+        questions.forEach(q => q.classList.remove('active'));
+        
+        // Show current question
+        document.getElementById('q' + questionNum).classList.add('active');
+        updateStepCounter();
+    }
+
+    function updateProgress() {
+        const progress = (currentQuestion / totalQuestions) * 100;
+        document.getElementById('progressFill').style.width = progress + '%';
+    }
+
+    function updateStepCounter() {
+        document.getElementById('stepCounter').textContent = `Pergunta ${currentQuestion} de ${totalQuestions}`;
+    }
+
+    function checkAgeInput() {
+        const ageInput = document.getElementById('ageInput');
+        const nextButton = document.getElementById('next1');
+        const errorMsg = document.getElementById('ageError');
+        
+        const age = parseInt(ageInput.value);
+        
+        if (age >= 16 && age <= 100) {
+            nextButton.classList.add('enabled');
+            errorMsg.style.display = 'none';
+            answers.age = age;
+        } else {
+            nextButton.classList.remove('enabled');
+            if (ageInput.value !== '') {
+                errorMsg.style.display = 'block';
+            }
+        }
+    }
+
+    function selectOption(questionNum, option, element, text) {
+        // Remove selection from other options
+        const options = element.parentNode.querySelectorAll('.option');
+        options.forEach(opt => opt.classList.remove('selected'));
+        
+        // Select current option
+        element.classList.add('selected');
+        
+        // Store answer
+        answers['q' + questionNum] = { option: option, text: text };
+        
+        // Enable next button
+        document.getElementById('next' + questionNum).classList.add('enabled');
+        
+        // Show emotional phrase
+        document.getElementById('phrase' + questionNum).classList.add('show');
+    }
+
+    function selectLeader(questionNum, option, element, name) {
+        // Remove selection from other leaders
+        const leaders = element.parentNode.querySelectorAll('.leader');
+        leaders.forEach(leader => leader.classList.remove('selected'));
+        
+        // Select current leader
+        element.classList.add('selected');
+        
+        // Store answer
+        answers['q' + questionNum] = { option: option, text: name };
+        
+        // Enable next button
+        document.getElementById('next' + questionNum).classList.add('enabled');
+        
+        // Show emotional phrase
+        document.getElementById('phrase' + questionNum).classList.add('show');
+    }
+
+    function checkQuestionInput() {
+        const questionInput = document.getElementById('questionInput');
+        const nextButton = document.getElementById('next5');
+        
+        if (questionInput.value.trim().length > 10) {
+            nextButton.classList.add('enabled');
+            answers.q5 = { text: questionInput.value.trim() };
+            document.getElementById('phrase5').classList.add('show');
+        } else {
+            nextButton.classList.remove('enabled');
+        }
+    }
+
+    function nextQuestion(current) {
+        if (current < totalQuestions) {
+            currentQuestion = current + 1;
+            showQuestion(currentQuestion);
+            updateProgress();
+        }
+    }
+
+    function showResults() {
+        // Hide current question
+        document.getElementById('q9').classList.remove('active');
+        
+        // Show loading
+        document.getElementById('loading').classList.add('active');
+        
+        // Hide progress bar
+        document.getElementById('progressBar').style.display = 'none';
+        document.getElementById('stepCounter').style.display = 'none';
+        
+        // Calculate result after 3 seconds
+        setTimeout(() => {
+            const result = calculateResult();
+            displayResult(result);
+            
+            // Hide loading, show results
+            document.getElementById('loading').classList.remove('active');
+            document.getElementById('results').classList.add('active');
+        }, 3000);
+    }
+
+    function calculateResult() {
+        // Simple algorithm to determine personality type
+        let strategistScore = 0;
+        let manipulatorScore = 0;
+        let leaderScore = 0;
+        
+        // Question 2 (Financial Reality)
+        if (answers.q2?.option === 'D') strategistScore += 2;
+        if (answers.q2?.option === 'C') manipulatorScore += 1;
+        if (answers.q2?.option === 'B') leaderScore += 1;
+        
+        // Question 3 (3x More Money)
+        if (answers.q3?.option === 'A') strategistScore += 2;
+        if (answers.q3?.option === 'C') manipulatorScore += 2;
+        if (answers.q3?.option === 'B') leaderScore += 2;
+        
+        // Question 4 (Leaders choice)
+        if (answers.q4?.option === 'A') strategistScore += 2; // Bill Gates
+        if (answers.q4?.option === 'C') manipulatorScore += 2; // Jeff Bezos
+        if (answers.q4?.option === 'B') leaderScore += 2; // Steve Jobs
+        if (answers.q4?.option === 'D') manipulatorScore += 1; // Elon Musk
+        
+        // Question 6 (Awareness)
+        if (answers.q6?.option === 'C') strategistScore += 2;
+        if (answers.q6?.option === 'A') manipulatorScore += 1;
+        
+        // Question 7 (Control)
+        if (answers.q7?.option === 'C') strategistScore += 2;
+        if (answers.q7?.option === 'B' || answers.q7?.option === 'D') manipulatorScore += 2;
+        if (answers.q7?.option === 'A') leaderScore += 1;
+        
+        // Question 8 (Obstacles)
+        if (answers.q8?.option === 'D') strategistScore += 2;
+        if (answers.q8?.option === 'C') manipulatorScore += 1;
+        if (answers.q8?.option === 'A') leaderScore += 1;
+        
+        // Determine result
+        if (strategistScore >= manipulatorScore && strategistScore >= leaderScore) {
+            if (manipulatorScore > 3) return 'hybrid';
+            return 'strategist';
+        } else if (manipulatorScore >= strategistScore && manipulatorScore >= leaderScore) {
+            if (strategistScore > 3) return 'hybrid';
+            return 'manipulator';
+        } else {
+            return 'leader';
+        }
+    }
+
+    function displayResult(resultType) {
+        const profile = profiles[resultType];
+        document.getElementById('resultTitle').textContent = profile.title;
+        document.getElementById('resultDescription').textContent = profile.description;
+        document.getElementById('nextStepText').textContent = profile.nextStep;
+    }
+
+    function handleFinalCTA() {
+        // Redirect to offer page or handle conversion
+        alert('Redirecionando para a página de oferta...');
+        // window.location.href = 'https://sua-pagina-de-oferta.com';
+    }
+
+    // Initialize quiz
+    document.addEventListener('DOMContentLoaded', function() {
+        // Quiz is ready
+        console.log('Quiz inicializado');
+    });
+</script>
+</body>
+</html>
